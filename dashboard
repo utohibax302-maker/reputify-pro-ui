@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <title>Reputify Pro — Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        peach: {
+                            DEFAULT: '#FFCCB3',
+                            dim: '#FFB399',
+                            dark: '#FF9980'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #0f172a 50%, #000000 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+        }
+        .glass-btn {
+             background: rgba(255, 255, 255, 0.05);
+             border: 1px solid rgba(255, 255, 255, 0.1);
+             backdrop-filter: blur(4px);
+             transition: all 0.3s ease;
+        }
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+        
+        .pill.active {
+            background-color: #FFCCB3;
+            color: #0f172a;
+            border-color: #FFCCB3;
+            box-shadow: 0 0 15px rgba(255, 204, 179, 0.4);
+        }
+        .tab-btn.active {
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-peach selection:text-slate-900">
+    <!-- Header -->
+    <header class="fixed top-0 w-full z-50 glass-panel border-b-0 border-b-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-3 h-3 rounded-full bg-peach shadow-[0_0_15px_rgba(255,204,179,0.8)]"></div>
+                <span class="font-display font-bold text-2xl tracking-wide text-white">Reputify<span class="text-peach">Pro</span></span>
+                
+                <div class="relative ml-8 group">
+                    <select id="location" class="appearance-none bg-white/5 border border-white/10 rounded-xl px-4 py-2 pr-10 text-sm focus:outline-none focus:border-peach/50 transition-colors cursor-pointer text-slate-300">
+                        <option class="bg-slate-900">Кофейня на Мира</option>
+                        <option class="bg-slate-900">Кофейня на Ленина</option>
+                    </select>
+                    <div class="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6">
+                <div class="flex flex-col items-end">
+                    <span class="text-xs text-slate-400 uppercase tracking-wider font-medium">Health Score</span>
+                    <div class="flex items-center gap-2">
+                        <span id="healthScore" class="font-display font-bold text-3xl text-white">0.0</span>
+                        <span id="healthDelta" class="text-sm font-medium px-2 py-0.5 rounded-full bg-white/5 border border-white/10">0.0</span>
+                    </div>
+                </div>
+                
+                <div class="h-8 w-px bg-white/10"></div>
+
+                <div class="flex gap-3">
+                    <button id="refresh" class="glass-btn rounded-xl p-2.5 text-slate-300 hover:text-white" title="Обновить">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    </button>
+                    <button onclick="location.href='/feedback'" class="bg-peach hover:bg-peach-dim text-slate-900 font-bold px-6 py-2.5 rounded-xl shadow-[0_0_20px_rgba(255,204,179,0.3)] transition-all transform hover:-translate-y-0.5 active:scale-95">
+                        Оставить отзыв
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 pt-32 pb-20">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Radar Chart Section -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                <div class="glass-panel rounded-3xl p-8 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-64 h-64 bg-peach/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+                    
+                    <h2 class="font-display font-bold text-xl mb-6 flex items-center gap-3">
+                        <svg class="w-6 h-6 text-peach" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        Intellectual Radar
+                    </h2>
+                    
+                    <div class="flex justify-center py-4">
+                        <canvas id="radar" width="400" height="350" class="max-w-full cursor-crosshair"></canvas>
+                    </div>
+                    <p class="text-center text-sm text-slate-400 mt-4">Кликните по оси, чтобы отфильтровать ленту отзывов</p>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="glass-panel rounded-3xl p-8 border-l-4 border-l-peach">
+                    <h2 class="font-display font-bold text-xl mb-4 flex items-center gap-3 text-peach">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        AI Insights
+                    </h2>
+                    <div id="insightText" class="text-lg font-medium leading-relaxed mb-6 text-slate-200">
+                        Загрузка инсайтов...
+                    </div>
+                    <button id="acceptInsight" class="w-full glass-btn text-peach font-semibold py-3 rounded-xl hover:bg-peach hover:text-slate-900 transition-colors">
+                        Принять в работу
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feed Section -->
+            <div class="lg:col-span-7 flex flex-col gap-6">
+                <!-- Tabs -->
+                <div class="flex p-1.5 bg-white/5 rounded-2xl w-fit backdrop-blur-sm border border-white/5">
+                    <button class="tab-btn px-6 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-300 hover:text-white" data-tab="feed">Smart Feed</button>
+                    <button class="tab-btn px-6 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-300 hover:text-white" data-tab="settings">The Brain</button>
+                    <button class="tab-btn px-6 py-2.5 rounded-xl text-sm font-medium transition-all text-slate-300 hover:text-white" data-tab="archive">Архив</button>
+                </div>
+
+                <!-- Main Content Area -->
+                <div id="feed" class="flex flex-col gap-6">
+                    <!-- Filters -->
+                    <div class="flex flex-wrap gap-2">
+                         <div class="pill glass-btn px-4 py-2 rounded-full text-xs font-medium cursor-pointer text-slate-300 hover:text-white border-white/10" data-filter="rating-5">⭐️ 5.0</div>
+                         <div class="pill glass-btn px-4 py-2 rounded-full text-xs font-medium cursor-pointer text-slate-300 hover:text-white border-white/10" data-filter="rating-4">⭐️ 4.0+</div>
+                         <div class="pill glass-btn px-4 py-2 rounded-full text-xs font-medium cursor-pointer text-slate-300 hover:text-white border-white/10" data-filter="positive">Pos</div>
+                         <div class="pill glass-btn px-4 py-2 rounded-full text-xs font-medium cursor-pointer text-slate-300 hover:text-white border-white/10" data-filter="negative">Neg</div>
+                         <div class="w-px h-6 bg-white/10 mx-2 self-center"></div>
+                         <div class="pill glass-btn px-4 py-2 rounded-full text-xs font-medium cursor-pointer text-slate-300 hover:text-white border-white/10" data-filter="aspect-Кухня">Кухня</div>
+                         <div class="pill glass-btn px-4 py-2 rounded-full text-xs font-medium cursor-pointer text-slate-300 hover:text-white border-white/10" data-filter="aspect-Сервис">Сервис</div>
+                         <div class="pill glass-btn px-4 py-2 rounded-full text-xs font-medium cursor-pointer text-slate-300 hover:text-white border-white/10" data-filter="aspect-Атмосфера">Атмосфера</div>
+                    </div>
+
+                    <div id="list" class="flex flex-col gap-4 max-h-[800px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Reviews injected here -->
+                    </div>
+                </div>
+
+                <!-- Settings / The Brain -->
+                <div id="settings" class="hidden glass-panel rounded-3xl p-8">
+                     <h3 class="font-display font-bold text-xl mb-2">Personality Tuning</h3>
+                     <p class="text-slate-400 text-sm mb-6">Настройте тон общения нейросети с клиентами</p>
+                     
+                     <div class="mb-8">
+                        <label class="block text-sm font-medium mb-4 flex justify-between">
+                            <span>Строгий</span>
+                            <span class="text-peach">Дружелюбный</span>
+                        </label>
+                        <input id="mood" type="range" min="0" max="100" class="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-peach">
+                     </div>
+
+                     <div class="flex items-center gap-3 mb-8">
+                        <input id="adapt" type="checkbox" class="w-5 h-5 rounded border-white/20 bg-white/5 text-peach focus:ring-peach focus:ring-offset-0">
+                        <label for="adapt" class="text-sm font-medium">Адаптивный тон (подстраиваться под настроение клиента)</label>
+                     </div>
+
+                     <h3 class="font-display font-bold text-xl mb-4 mt-8">Radar Config</h3>
+                     <input id="axes" type="text" value="Кухня,Сервис,Атмосфера,Чистота,Напитки" class="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm focus:border-peach/50 focus:outline-none transition-colors text-white">
+                </div>
+
+                <!-- Archive -->
+                <div id="archive" class="hidden glass-panel rounded-3xl p-8">
+                    <h3 class="font-display font-bold text-xl mb-6">Архив отзывов</h3>
+                    <div id="archived" class="flex flex-col gap-4"></div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let items = [];
+        let filters = new Set();
+        let archivedIds = JSON.parse(localStorage.getItem('archivedIds')||'[]');
+
+        function applyFilters(list) {
+            let out = list.filter(i => {
+                if (filters.has('rating-5') && i.rating !== 5) return false;
+                if (filters.has('rating-4') && i.rating < 4) return false;
+                if (filters.has('positive') && i.rating < 4) return false;
+                if (filters.has('negative') && i.rating >= 4) return false;
+                for (const f of filters) {
+                    if (f.startsWith('aspect-')) {
+                        const a = f.split('-')[1];
+                        const text = (i.text_content||'').toLowerCase();
+                        const map = {
+                            'Кухня': ['вкус','еда','блюдо','повар'],
+                            'Сервис': ['официант','персонал','сервис','обслужив'],
+                            'Атмосфера': ['атмосфер','музык','уют','шум'],
+                            'Чистота': ['гряз','чист','уборк','туалет'],
+                            'Напитки': ['кофе','чай','напит','барист']
+                        };
+                        const kws = map[a]||[];
+                        if (!kws.some(k=>text.includes(k))) return false;
+                    }
+                }
+                if (archivedIds.includes(i.id)) return false;
+                return true;
+            });
+            return out;
+        }
+
+        function renderList() {
+            const list = document.getElementById('list');
+            list.innerHTML = '';
+            const shown = applyFilters(items);
+            
+            if (shown.length === 0) {
+                list.innerHTML = '<div class="text-center text-slate-500 py-10">Нет отзывов по выбранным фильтрам</div>';
+                return;
+            }
+
+            shown.forEach(i => {
+                const div = document.createElement('div');
+                div.className = 'glass-panel rounded-2xl p-5 hover:bg-white/5 transition-colors group relative';
+                
+                const statusOk = i.ai_reply && i.ai_reply !== 'Pending';
+                const [sum, ans] = (i.ai_reply||'').split('|');
+                
+                const badgeClass = statusOk 
+                    ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' 
+                    : 'bg-amber-500/10 text-amber-300 border-amber-500/20';
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex items-center gap-3">
+                            <span class="font-mono text-xs text-slate-500 bg-black/20 px-2 py-1 rounded">#${i.id.slice(0,8)}</span>
+                            <span class="text-xs font-semibold px-2 py-1 rounded border ${badgeClass}">
+                                ${statusOk ? 'Обработано' : 'В ожидании'}
+                            </span>
+                        </div>
+                        <div class="font-display font-bold text-xl text-peach">${i.rating} <span class="text-sm text-slate-500">/ 5</span></div>
+                    </div>
+                    
+                    <div class="text-slate-200 text-sm leading-relaxed mb-4">
+                        "${(sum||i.text_content||'').replace(/</g,'&lt;')}"
+                    </div>
+
+                    ${statusOk ? `
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/5 mt-2">
+                        <div class="flex items-center gap-2 mb-2 text-xs font-medium text-peach uppercase tracking-wide">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            AI Ответ
+                        </div>
+                        <div class="text-sm text-slate-300">${(ans||'').replace(/</g,'&lt;')}</div>
+                    </div>
+                    ` : ''}
+
+                    <div class="flex justify-end gap-3 mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                         <button class="text-xs text-slate-400 hover:text-white transition-colors" data-archive="${i.id}">В архив</button>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function renderArchive() {
+            const cont = document.getElementById('archived');
+            cont.innerHTML = '';
+            const ar = items.filter(i=>archivedIds.includes(i.id));
+            if (ar.length === 0) {
+                cont.innerHTML = '<div class="text-center text-slate-500 py-10">Архив пуст</div>';
+                return;
+            }
+            ar.forEach(i=>{
+                const d=document.createElement('div');
+                d.className='glass-panel rounded-xl p-4 opacity-75';
+                d.innerHTML = `<div class="flex justify-between mb-2"><span class="font-mono text-xs text-slate-500">#${i.id.slice(0,8)}</span><span class="font-bold text-peach">${i.rating}</span></div><div class="text-sm text-slate-400 line-clamp-2">${(i.text_content||'').replace(/</g,'&lt;')}</div>`;
+                cont.appendChild(d);
+            });
+        }
+
+        async function fetchReviews() {
+            try {
+                const res = await fetch('/reviews');
+                const data = await res.json();
+                items = data.items||[];
+                
+                const avg = items.length ? (items.reduce((a,b)=>a+b.rating,0)/items.length) : 0;
+                const prev = parseFloat(localStorage.getItem('healthPrev')||avg);
+                localStorage.setItem('healthPrev', avg.toFixed(1));
+                const delta = (avg - prev).toFixed(1);
+                
+                const scoreEl = document.getElementById('healthScore');
+                const deltaEl = document.getElementById('healthDelta');
+                
+                scoreEl.textContent = avg.toFixed(1);
+                deltaEl.textContent = (delta>=0? '+' : '') + delta;
+                
+                if (delta > 0) {
+                    deltaEl.className = 'text-sm font-medium px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400';
+                } else if (delta < 0) {
+                     deltaEl.className = 'text-sm font-medium px-2 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400';
+                } else {
+                     deltaEl.className = 'text-sm font-medium px-2 py-0.5 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-400';
+                }
+
+                drawRadar(items);
+                renderList();
+                renderArchive();
+                buildInsight(items);
+            } catch (e) {
+                console.error("Failed to fetch reviews", e);
+            }
+        }
+
+        function drawRadar(list) {
+            const axes = (document.getElementById('axes').value||'Кухня,Сервис,Атмосфера,Чистота,Напитки').split(',').map(s=>s.trim()).filter(Boolean);
+            const ctx = document.getElementById('radar').getContext('2d');
+            
+            const w = 400, h = 350;
+            const cx=w/2, cy=h/2, r=120;
+            
+            ctx.clearRect(0,0,w,h);
+            
+            const scores = axes.map(a=>{
+                const kws = {
+                  'Кухня': ['вкус','еда','блюдо','повар'],
+                  'Сервис': ['официант','персонал','сервис','обслужив'],
+                  'Атмосфера': ['атмосфер','музык','уют','шум'],
+                  'Чистота': ['гряз','чист','уборк','туалет'],
+                  'Напитки': ['кофе','чай','напит','барист']
+                }[a] || [];
+                let hits=0, total=0;
+                list.forEach(i=>{
+                  const t=(i.text_content||'').toLowerCase();
+                  if (kws.some(k=>t.includes(k))) { hits+=i.rating; total+=5; }
+                });
+                const v = total? (hits/total)*5 : 2.5; 
+                return Math.max(0.5, Math.min(5, v));
+            });
+
+            ctx.strokeStyle='rgba(255, 255, 255, 0.1)'; 
+            ctx.lineWidth=1;
+            for(let ring=1; ring<=5; ring++){ 
+                ctx.beginPath(); 
+                ctx.arc(cx,cy,(r/5)*ring,0,Math.PI*2); 
+                ctx.stroke(); 
+            }
+
+            ctx.beginPath();
+            axes.forEach((_, idx) => {
+                 const ang = (Math.PI*2)*(idx/axes.length) - Math.PI/2;
+                 const x = cx + r*Math.cos(ang);
+                 const y = cy + r*Math.sin(ang);
+                 ctx.moveTo(cx, cy);
+                 ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            const pts = axes.map((a,idx)=>{
+                const ang = (Math.PI*2)*(idx/axes.length) - Math.PI/2;
+                const pr = (scores[idx]/5)*r;
+                const x = cx + pr*Math.cos(ang);
+                const y = cy + pr*Math.sin(ang);
+                return {x,y,ang,label:a};
+            });
+
+            ctx.beginPath();
+            pts.forEach((p,idx)=>{ if(idx===0) ctx.moveTo(p.x,p.y); else ctx.lineTo(p.x,p.y); });
+            ctx.closePath(); 
+            
+            const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
+            gradient.addColorStop(0, 'rgba(255, 204, 179, 0.4)');
+            gradient.addColorStop(1, 'rgba(255, 204, 179, 0.1)');
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            ctx.strokeStyle = '#FFCCB3'; 
+            ctx.lineWidth = 3; 
+            ctx.stroke();
+
+            ctx.fillStyle = '#fff';
+            ctx.font = '12px Inter';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            pts.forEach(p=>{
+                ctx.beginPath(); ctx.arc(p.x,p.y,4,0,Math.PI*2); ctx.fillStyle='#FFCCB3'; ctx.fill();
+                
+                const lx = cx + (r+24)*Math.cos(p.ang);
+                const ly = cy + (r+24)*Math.sin(p.ang);
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
+                ctx.fillText(p.label, lx, ly);
+            });
+
+            const canvas = document.getElementById('radar');
+            canvas.onclick = function(ev){
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const mx = (ev.clientX - rect.left) * scaleX;
+                const my = (ev.clientY - rect.top) * scaleY;
+                
+                let nearest = {idx:0, dist:1e9};
+                pts.forEach((p,idx)=>{
+                  const axisTipX = cx + r*Math.cos(p.ang);
+                  const axisTipY = cy + r*Math.sin(p.ang);
+                  const d = Math.hypot(mx-axisTipX, my-axisTipY);
+                  if (d < nearest.dist) nearest = {idx, dist:d};
+                });
+                
+                filters.clear();
+                filters.add('aspect-' + axes[nearest.idx]);
+                
+                document.querySelectorAll('.pill').forEach(el=>el.classList.remove('active'));
+                const pill = document.querySelector(`[data-filter="aspect-${axes[nearest.idx]}"]`);
+                if(pill) pill.classList.add('active');
+                
+                renderList();
+            };
+        }
+
+        function buildInsight(list) {
+            let waitComplaints = 0, total= list.length;
+            list.forEach(i=>{ const t=(i.text_content||'').toLowerCase(); if (t.includes('ждал')||t.includes('очеред')) waitComplaints++; });
+            const pct = total? Math.round((waitComplaints/total)*100) : 0;
+            const text = `⚠️ Проблема: Жалобы на ожидание выросли на ${pct}%. Решение: Выведите дополнительного бариста в смену в часы пик.`;
+            document.getElementById('insightText').textContent = text;
+        }
+
+        document.getElementById('refresh').addEventListener('click', fetchReviews);
+        
+        document.querySelectorAll('.pill').forEach(el=>{
+            el.onclick = function(){
+                const key = el.getAttribute('data-filter');
+                if (filters.has(key)) filters.delete(key); else filters.add(key);
+                el.classList.toggle('active');
+                renderList();
+            };
+        });
+        
+        document.querySelectorAll('.tab-btn').forEach(el=>{
+            el.onclick = function(){
+                document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+                el.classList.add('active');
+                const tab = el.getAttribute('data-tab');
+                
+                document.getElementById('feed').classList.toggle('hidden', tab!=='feed');
+                document.getElementById('feed').classList.toggle('flex', tab==='feed');
+                
+                document.getElementById('settings').classList.toggle('hidden', tab!=='settings');
+                document.getElementById('archive').classList.toggle('hidden', tab!=='archive');
+            };
+        });
+
+        document.addEventListener('click', function(ev){
+            const t = ev.target;
+            if (t.hasAttribute('data-archive')) {
+                const id = t.getAttribute('data-archive');
+                if (!archivedIds.includes(id)) archivedIds.push(id);
+                localStorage.setItem('archivedIds', JSON.stringify(archivedIds));
+                renderList();
+                renderArchive();
+            }
+        });
+
+        document.querySelector('[data-tab="feed"]').click();
+        
+        fetchReviews();
+    </script>
+</body>
+</html>
